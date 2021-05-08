@@ -1,23 +1,20 @@
 from CommandManager import *
-from Spotify import *
 from Twitch import *
+import random
 import re
 
-MSG_HELP_FR = "Je connais les commandes suivantes : !aide !help !cmd !addsong"
-MSG_HELP_EN = "I know the following commands: !aide !help !cmd !addsong"
+MSG_HELP_FR = "Je connais les commandes suivantes : !aide !help !cmd !<n>d<f> (n = nombre de dés, f = nombre de faces)"
+MSG_HELP_EN = "I know the following commands: !aide !help !cmd !<n>d<f> (n = dices number, f = faces number)"
 MSG_REFUSE = "Je ne connais pas cette commande, "
 PATTERN_ARGS = "\{[0-9]+\}"
+PATTERN_DICE = "^([0-9]+)d([0-9]+)$"
 
 class ChatBot:
 
     twitch = Twitch()
-    spotify = Spotify()
 
     msg_hi = ""
     msg_bye = ""
-    spotify_client_id = ""
-    spotify_client_secret = ""
-    spotify_playlist_id = ""
 
     started = False
     commands = CommandManager()
@@ -34,11 +31,6 @@ class ChatBot:
     def set_twitch_settings(self, channel, username, password):
         self.twitch.set_channel(channel)
         self.twitch.set_user(username, password)
-
-    def set_spotify_settings(self, client_id, client_secret, playlist_id):
-        self.spotify_client_id = client_id
-        self_spotify_client_secret = client_secret
-        self_spotify_playlist_id = playlist_id
 
     # Commands -----
 
@@ -73,12 +65,6 @@ class ChatBot:
             self.commands.del_command(components[2])
             self.twitch.send("La commande !" + components[2] + " a été supprimée, @" + response["username"])
 
-    def add_song(self, query):
-        if len(query) == 1:
-            self.twitch.send("Utilisation de la commande: !addsong Titre")
-        else:
-            self.twitch.send("Ici je pourrai ajouter des chansons à la liste de lecture")
-
     def custom_command(self, message):
         components = message.split(" ", 1)
         command = self.commands.get(components[0][1:])
@@ -98,6 +84,12 @@ class ChatBot:
         else:
             self.twitch.send(command)
 
+    def launch_dices(self, number, size):
+        dices = []
+        for i in range(0, number):
+            dices.append(str(random.randint(1, size)))
+        self.twitch.send("Vous avez obtenu : " + " + ".join(dices))
+
     def refuse(self, username):
         self.twitch.send(MSG_REFUSE + "@" + username)
 
@@ -115,16 +107,17 @@ class ChatBot:
 
     def eval_command(self, response):
         command = response["message"].split(" ", 1)[0][1:]
+        m = re.match(PATTERN_DICE, command)
         if command == "aide" or command == "help":
             self.display_help(command)
         elif command == "stop":
             self.stop_command(response["badges"])
         elif command == "cmd":
             self.manage_commands(response)
-        elif command == "addsong":
-            self.add_song(response["message"].split(" ", 1))
         elif self.commands.has(command):
             self.custom_command(response["message"])
+        elif m:
+            self.launch_dices(int(m.group(1)), int(m.group(2)))
         else:
             self.refuse(response["username"])
 

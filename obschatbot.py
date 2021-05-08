@@ -2,7 +2,7 @@ from ChatBot import *
 from obspython import *
 from threading import Thread
 
-DESCRIPTION = "Twitch chat bot thats interacts with OBS and Spotify\n\nby kholo"
+DESCRIPTION = "Twitch chat bot thats interacts with OBS\n\nby kholo"
 
 chatbot = ChatBot()
 thread = Thread()
@@ -33,13 +33,6 @@ def create_twitch_properties():
     obs_properties_add_text(twitch, "msg_bye", "Farewell message", OBS_TEXT_DEFAULT)
     return twitch
 
-def create_spotify_properties():
-    spotify = obs_properties_create()
-    obs_properties_add_text(spotify, "client_id", "Client ID", OBS_TEXT_DEFAULT)
-    obs_properties_add_text(spotify, "client_secret", "Client secret", OBS_TEXT_PASSWORD)
-    obs_properties_add_text(spotify, "playlist_id", "Playlist ID", OBS_TEXT_DEFAULT)
-    return spotify
-
 # OBS functions -----
 
 def script_description():
@@ -53,7 +46,6 @@ def script_properties():
     props = obs_properties_create()
     obs_properties_add_path(props, "cmd_file", "Commands list", OBS_PATH_FILE, "Text file (*.txt)", None)
     obs_properties_add_group(props, "twitch", "Twitch IRC settings", OBS_GROUP_NORMAL, create_twitch_properties())
-    obs_properties_add_group(props, "spotify", "Spotify settings", OBS_GROUP_NORMAL, create_spotify_properties())
     obs_properties_add_button(props, "start", "Start bot", start)
     obs_properties_add_button(props, "stop", "Stop bot", stop)
     return props
@@ -71,9 +63,4 @@ def script_update(settings):
         obs_data_get_string(settings, "channel"),
         obs_data_get_string(settings, "username"),
         obs_data_get_string(settings, "password")
-    )
-    chatbot.set_spotify_settings(
-        obs_data_get_string(settings, "client_id"),
-        obs_data_get_string(settings, "client_secret"),
-        obs_data_get_string(settings, "playlist_id")
     )

@@ -4,28 +4,32 @@ import time
 class Irc:
 
     irc = socket.socket()
+    channel = ""
 
     def __init__(self):
         self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def connect(self, server, port, channel, nickname, password):
+    def send_raw(self, msg):
+        self.irc.send(bytes(msg + "\n", "UTF-8"))
+
+    def connect(self, server, port, username, password):
         self.irc.connect((server, port))
-        self.irc.send(bytes("PASS " + password + "\n", "UTF-8"))
-        self.irc.send(bytes("NICK " + nickname + "\n", "UTF-8"))
-        self.irc.send(bytes("JOIN " + channel + "\n", "UTF-8"))
+        self.send_raw("PASS " + password)
+        self.send_raw("NICK " + username)
 
-    def disconnect(self):
-        self.irc.close()
+    def join(self, channel):
+        self.channel = "#" + channel
+        self.send_raw("JOIN " + self.channel)
 
-    def send_raw(self, raw):
-        self.irc.send(bytes(raw + "\n", "UTF-8"))
-
-    def send(self, channel, msg):
-        self.irc.send(bytes("PRIVMSG " + channel + " :" + msg + "\n", "UTF-8"))
+    def send(self, msg):
+        self.send_raw("PRIVMSG " + self.channel + " :" + msg)
 
     def get_response(self):
         time.sleep(1)
-        resp = self.irc.recv(2040).decode("UTF-8")
-        if resp.find("PING") != -1:
-            self.irc.send(bytes("PONG " + resp.split()[1] + "\r\n", "UTF-8"))
-        return resp
+        response = self.irc.recv(2040).decode("UTF-8")
+        if response.find("PING") != -1:
+            self.send_raw("PONG " + response.split()[1])
+        return response
+
+    def disconnect(self):
+        self.irc.close()

@@ -1,47 +1,79 @@
 from ChatBot import *
+from obspython import *
 from threading import Thread
-import obspython as obs
+
+DESCRIPTION = "Twitch chat bot thats interacts with OBS and Spotify\n\nby kholo"
 
 chatbot = ChatBot()
+thread = Thread()
 
-def start_bot():
-    global chatbot
-    chatbot.start()
-
-def stop_bot():
-    global chatbot
-    chatbot.stop()
+# Callable functions -----
 
 def start(props, prop):
+    global chatbot
     global thread
+    thread = Thread(target=chatbot.start)
+    thread.daemon = True
     thread.start()
 
 def stop(props, prop):
+    global chatbot
     global thread
-    stop_bot()
+    chatbot.stop()
     thread.join()
 
-thread = Thread(target=start_bot)
-thread.daemon = True
+# Helpers -----
+
+def create_twitch_properties():
+    twitch = obs_properties_create()
+    obs_properties_add_text(twitch, "channel", "Twitch channel", OBS_TEXT_DEFAULT)
+    obs_properties_add_text(twitch, "username", "Bot username", OBS_TEXT_DEFAULT)
+    obs_properties_add_text(twitch, "password", "Bot oauth password", OBS_TEXT_PASSWORD)
+    obs_properties_add_text(twitch, "msg_hi", "Greetings message", OBS_TEXT_DEFAULT)
+    obs_properties_add_text(twitch, "msg_bye", "Farewell message", OBS_TEXT_DEFAULT)
+    return twitch
+
+def create_spotify_properties():
+    spotify = obs_properties_create()
+    obs_properties_add_text(spotify, "client_id", "Client ID", OBS_TEXT_DEFAULT)
+    obs_properties_add_text(spotify, "client_secret", "Client secret", OBS_TEXT_PASSWORD)
+    obs_properties_add_text(spotify, "playlist_id", "Playlist ID", OBS_TEXT_DEFAULT)
+    return spotify
 
 # OBS functions -----
 
-def script_defaults(settings):
-    obs.obs_data_set_default_string(settings, "channel", "#channel")
-
 def script_description():
-    return "Twitch chat bot that could directly interact with OBS Studio.\n\nBy kholo"
+    return DESCRIPTION
+
+def script_defaults(settings):
+    obs_data_set_default_string(settings, "msg_hi", "Bonjour, je suis à votre service. !aide ou !help pour en savoir plus.")
+    obs_data_set_default_string(settings, "msg_bye", "Merci pour votre compagnie, au revoir.")
 
 def script_properties():
-    props = obs.obs_properties_create()
-    obs.obs_properties_add_text(props, "channel", "Channel name", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_text(props, "nickname", "IRC username", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_text(props, "password", "IRC password", obs.OBS_TEXT_DEFAULT)
-    obs.obs_properties_add_button(props, "start", "Start", start)
-    obs.obs_properties_add_button(props, "stop", "Stop", stop)
+    props = obs_properties_create()
+    obs_properties_add_path(props, "cmd_file", "Commands list", OBS_PATH_FILE, "Text file (*.txt)", None)
+    obs_properties_add_group(props, "twitch", "Twitch IRC settings", OBS_GROUP_NORMAL, create_twitch_properties())
+    obs_properties_add_group(props, "spotify", "Spotify settings", OBS_GROUP_NORMAL, create_spotify_properties())
+    obs_properties_add_button(props, "start", "Start bot", start)
+    obs_properties_add_button(props, "stop", "Stop bot", stop)
     return props
 
 def script_update(settings):
     global chatbot
-    chatbot.set_channel(obs.obs_data_get_string(settings, "channel"))
-    chatbot.set_user(obs.obs_data_get_string(settings, "nickname"), obs.obs_data_get_string(settings, "password"))
+    chatbot.set_command_file(
+        obs_data_get_string(settings, "cmd_file")
+    )
+    chatbot.set_messages(
+        obs_data_get_string(settings, "msg_hi"),
+        obs_data_get_string(settings, "msg_bye")
+    )
+    chatbot.set_twitch_settings(
+        obs_data_get_string(settings, "channel"),
+        obs_data_get_string(settings, "username"),
+        obs_data_get_string(settings, "password")
+    )
+    chatbot.set_spotify_settings(
+        obs_data_get_string(settings, "client_id"),
+        obs_data_get_string(settings, "client_secret"),
+        obs_data_get_string(settings, "playlist_id")
+    )

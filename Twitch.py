@@ -38,7 +38,7 @@ class Twitch:
         return {
             "username": raw[1].split("!")[0][1:],
             "badges": self.parse_badges(self.parse_tags(raw[0])),
-            "message": raw[4][1:]
+            "message": raw[4][1:].strip()
         }
     def parse_tags(self, raw):
         tags = {}
@@ -55,3 +55,11 @@ class Twitch:
 
     def stop(self):
         self.irc.disconnect()
+
+    # Helpers -----
+
+    def is_broadcaster(self, badges):
+        return "broadcaster" in badges
+
+    def is_moderator(self, badges):
+        return "admin" in badges or "broadcaster" in badges or "moderator" in badges

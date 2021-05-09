@@ -1,6 +1,6 @@
 # obschatbot
 A Twitch chat-bot that could directly interact with OBS Studio and Spotify
 
-Requires: python >= 3.6
+Requires: python >= 3.6, requests
 
 Only tested with GNU/Linux

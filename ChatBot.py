@@ -1,20 +1,25 @@
 from CommandManager import *
+from Spotify import *
 from Twitch import *
 import random
 import re
 
-MSG_HELP_FR = "Je connais les commandes suivantes : !aide !help !cmd !<n>d<f> (n = nombre de dés, f = nombre de faces)"
-MSG_HELP_EN = "I know the following commands: !aide !help !cmd !<n>d<f> (n = dices number, f = faces number)"
+MSG_HELP_FR = "Je connais les commandes suivantes : !aide !help !cmd !addsong !<n>d<f> (n = nombre de dés, f = nombre de faces)"
+MSG_HELP_EN = "I know the following commands: !aide !help !cmd !addsong !<n>d<f> (n = dices number, f = faces number)"
 MSG_REFUSE = "Je ne connais pas cette commande, "
 PATTERN_ARGS = "\{[0-9]+\}"
 PATTERN_DICE = "^([0-9]+)d([0-9]+)$"
 
 class ChatBot:
 
+    spotify = Spotify()
     twitch = Twitch()
 
     msg_hi = ""
     msg_bye = ""
+
+    playlist_id = ""
+    spotify_code = ""
 
     started = False
     commands = CommandManager()
@@ -31,6 +36,24 @@ class ChatBot:
     def set_twitch_settings(self, channel, username, password):
         self.twitch.set_channel(channel)
         self.twitch.set_user(username, password)
+
+    def set_spotify_settings(self, playlist_id, client_id, client_secret):
+        self.playlist_id = playlist_id
+        self.spotify.set_credentials(client_id, client_secret)
+
+    def set_spotify_code(self, code):
+        self.spotify_code = code
+
+    def set_spotify_refresh_token(self, token):
+        self.spotify.refresh_token = token
+
+    # Helpers -----
+
+    def get_spotify_code_url(self):
+        return self.spotify.get_authorization_url()
+
+    def authorize_spotify(self):
+        return self.spotify.authorize(self.spotify_code)
 
     # Commands -----
 
@@ -65,6 +88,23 @@ class ChatBot:
             self.commands.del_command(components[2])
             self.twitch.send("La commande !" + components[2] + " a été supprimée, @" + response["username"])
 
+    def add_song(self, message):
+        components = message.split(" ", 1)
+        if len(components) < 2:
+            self.twitch.send("Utilisation: !addsong <critères de recherches>")
+            return
+        query = components[1]
+        track = self.spotify.search(query)
+        if track is None:
+            self.twitch.send("Aucun titre trouvé :(")
+            return
+        if self.spotify.add_to_playlist(self.playlist_id, track):
+            artist = track["artists"][0]["name"]
+            title = track["name"]
+            self.twitch.send("Le morceau '" + title + "' de " + artist + " a été ajouté")
+        else:
+            self.twitch.send("Le morceau n'a pas pu être ajouté")
+
     def custom_command(self, message):
         components = message.split(" ", 1)
         command = self.commands.get(components[0][1:])
@@ -97,6 +137,7 @@ class ChatBot:
 
     def start(self):
         self.commands.load()
+        self.spotify.refresh()
         self.twitch.start()
         self.twitch.send(self.msg_hi)
         self.started = True
@@ -114,6 +155,8 @@ class ChatBot:
             self.stop_command(response["badges"])
         elif command == "cmd":
             self.manage_commands(response)
+        elif command == "addsong":
+            self.add_song(response["message"])
         elif self.commands.has(command):
             self.custom_command(response["message"])
         elif m:

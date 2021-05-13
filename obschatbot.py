@@ -69,11 +69,11 @@ def script_defaults(settings):
 
 def script_properties():
     props = obs_properties_create()
+    obs_properties_add_button(props, "start", "Start bot", start)
+    obs_properties_add_button(props, "stop", "Stop bot", stop)
     obs_properties_add_path(props, "cmd_file", "Commands list", OBS_PATH_FILE, "Text file (*.txt)", None)
     obs_properties_add_group(props, "twitch", "Twitch IRC settings", OBS_GROUP_NORMAL, create_twitch_properties())
     obs_properties_add_group(props, "spotify", "Spotify API settings", OBS_GROUP_NORMAL, create_spotify_properties())
-    obs_properties_add_button(props, "start", "Start bot", start)
-    obs_properties_add_button(props, "stop", "Stop bot", stop)
     return props
 
 def script_update(settings):

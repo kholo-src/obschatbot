@@ -1,3 +1,4 @@
+import select
 import socket
 import time
 
@@ -25,10 +26,12 @@ class Irc:
         self.send_raw("PRIVMSG " + self.channel + " :" + msg)
 
     def get_response(self):
-        time.sleep(1)
-        response = self.irc.recv(2040).decode("UTF-8")
-        if response.find("PING") != -1:
-            self.send_raw("PONG " + response.split()[1])
+        rlist, wlist, elist = select.select([self.irc], [], [], 1)
+        response = ""
+        if rlist:
+            response = self.irc.recv(2040).decode("UTF-8")
+            if response.find("PING") != -1:
+                self.send_raw("PONG " + response.split()[1])
         return response
 
     def disconnect(self):

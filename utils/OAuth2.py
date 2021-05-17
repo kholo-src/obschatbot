@@ -65,9 +65,9 @@ class OAuth2:
             client, addr = httpd.accept()
             response = client.recv(BUFFER_SIZE).decode(ENCODING)
             if "GET" in response and "code=" in response:
-                client.send(bytes("HTTP/1.0 200 OK\n"), ENCODING)
-                client.send(bytes("Content-Type: text/html\n"), ENCODING)
-                client.send(bytes("\n"), ENCODING)
+                client.send(bytes("HTTP/1.0 200 OK\n", ENCODING))
+                client.send(bytes("Content-Type: text/html\n", ENCODING))
+                client.send(bytes("\n", ENCODING))
                 client.send(bytes(HTML_RESPONSE, ENCODING))
                 client.close()
                 waiting = False

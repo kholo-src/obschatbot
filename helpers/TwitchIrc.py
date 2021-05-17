@@ -38,7 +38,6 @@ class TwitchIrc:
         response = self.irc.receive()
         if not response:
             return
-        print(response)
         if "PRIVMSG" in response and self.channel in response:
             return self.parse(response)
 

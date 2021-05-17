@@ -38,6 +38,7 @@ class TwitchIrc:
         response = self.irc.receive()
         if not response:
             return
+        print(response)
         if "PRIVMSG" in response and self.channel in response:
             return self.parse(response)
 
@@ -54,15 +55,16 @@ class TwitchIrc:
         tags = {}
         for tag in tags_str.split(";"):
             name, value = tag.split("=")
-            if name == "badge-info":
+            if name == "badge-info" and value != "":
                 value = self.parse_badge(value)
             elif name in ["badges", "emotes"]:
                 value = value.split(",")
                 if name == "badges":
                     badges = []
-                    for badge in value:
-                        badges.append(self.parse_badge(badge))
-                    value = badges
+                    if value != [""]:
+                        for badge in value:
+                            badges.append(self.parse_badge(badge))
+                        value = badges
             tags[name] = value
         return tags
 

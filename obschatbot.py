@@ -55,7 +55,7 @@ def auth_spotify(props, prop):
     print("[--- AUTHORIZING SPOTIFY ---]")
     print("This will open a new tab or window in your browser, where you will have to confirm the authorization.")
     services["spotify"]["settings"]["spotify_token"] = services["spotify"]["service"].get_authorization()
-    print("You can close the browser window with the error message.\nAuthorization complete.\n[--- /AUTHORIZING SPOTIFY ---]")
+    print("You can close the browser window.\nAuthorization complete.\n[--- /AUTHORIZING SPOTIFY ---]")
 
 # Helpers -----
 

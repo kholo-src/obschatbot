@@ -66,7 +66,7 @@ class CommandService(Service):
             return f"{MSG_UNKNOWN}, @{response['username']}"
 
     def add_command(self, command, args):
-        self.commands[command] = args
+        self.commands[command.lstrip("!")] = args
         self.write()
         return f"La commande '!{command}' a été ajoutée"
 

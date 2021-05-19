@@ -54,8 +54,11 @@ class TwitchIrc:
         tags = {}
         for tag in tags_str.split(";"):
             name, value = tag.split("=")
-            if name == "badge-info" and value != "":
-                value = self.parse_badge(value)
+            if name == "badge-info":
+                if value != "":
+                    value = self.parse_badge(value)
+                else:
+                    value = None
             elif name in ["badges", "emotes"]:
                 value = value.split(",")
                 if name == "badges":
@@ -64,6 +67,8 @@ class TwitchIrc:
                         for badge in value:
                             badges.append(self.parse_badge(badge))
                         value = badges
+                    else:
+                        value = []
             tags[name] = value
         return tags
 

@@ -100,6 +100,8 @@ def script_properties():
     props = obs_properties_create()
     obs_properties_add_button(props, "start", "Start Bot", start)
     obs_properties_add_button(props, "stop", "Stop Bot", stop)
+    obs_properties_add_text(props, "msg_hi", "Welcome message", OBS_TEXT_DEFAULT)
+    obs_properties_add_text(props, "msg_bye", "Farewell message", OBS_TEXT_DEFAULT)
     obs_properties_add_group(props, "irc", "Twitch IRC", OBS_GROUP_NORMAL, create_twitch_irc_properties())
     obs_properties_add_group(props, "command", "Command Service", OBS_GROUP_CHECKABLE, create_cmd_properties())
     obs_properties_add_group(props, "dice", "Dice Service", OBS_GROUP_CHECKABLE, create_dice_properties())
@@ -107,6 +109,8 @@ def script_properties():
     return props
 
 def script_update(settings):
+    chatbot.set_welcome_message(obs_data_get_string(settings, "msg_hi"))
+    chatbot.set_farewell_message(obs_data_get_string(settings, "msg_bye"))
     chatbot.set_twitch_irc_settings(
         obs_data_get_string(settings, "irc_nickname"),
         obs_data_get_string(settings, "irc_password"),

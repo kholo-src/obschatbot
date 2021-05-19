@@ -3,6 +3,7 @@ from helpers.TwitchIrc import TwitchIrc
 MSG_HELP = "Je connais les commandes suivantes :"
 MSG_CANT_STOP = "Personne ne peut m'arrêter !"
 MSG_STOP = "Oh non..."
+MSG_UNKNOWN_CMD = "Je ne connais pas cette commande"
 
 class ChatBot:
 
@@ -10,6 +11,9 @@ class ChatBot:
 
     services = []
     users = {}
+
+    msg_hi = ""
+    msg_bye = ""
 
     running = False
 
@@ -23,6 +27,12 @@ class ChatBot:
 
     def clear_services(self):
         self.services = []
+    
+    def set_welcome_message(self, message):
+        self.msg_hi = message
+
+    def set_farewell_message(self, message):
+        self.msg_bye = message
 
     # Commands -----
 
@@ -36,6 +46,7 @@ class ChatBot:
             return
         for service in self.services:
             if not service.knows(command):
+                self.twitch_irc.send(f"{MSG_UNKNOWN_CMD}, {response['username']}")
                 continue
             result = service.eval(command, response, self.users)
             if result:
@@ -65,6 +76,8 @@ class ChatBot:
             service.start()
         self.twitch_irc.request_tags()
         self.twitch_irc.start()
+        if self.msg_hi != "":
+            self.twitch_irc.send(self.msg_hi)
         self.running = True
         while self.running:
             response = self.twitch_irc.receive()
@@ -73,6 +86,8 @@ class ChatBot:
 
     def stop(self):
         self.running = False
+        if self.msg_bye != "":
+            self.twitch_irc.send(self.msg_bye)
         self.twitch_irc.stop()
         for service in self.services:
             service.stop()

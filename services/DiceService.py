@@ -2,7 +2,7 @@ from services.Service import Service
 import random
 import re
 
-KNOWN_COMMANDS = ["last_rolls", "clear_rolls"]
+KNOWN_COMMANDS = ["lastrolls", "clearrolls"]
 USER_KEY = "last_dice_roll"
 
 MSG_CLEARED = "Les résultats ont été effacés"
@@ -17,9 +17,9 @@ class DiceService(Service):
         return command in KNOWN_COMMANDS or re.match(PATTERN_DICE, command)
 
     def eval(self, command, response, users):
-        if command == "last_rolls":
+        if command == "lastrolls":
             return self.get_last_rolls(users)
-        elif command == "clear_rolls":
+        elif command == "clearrolls":
             return self.clear_rolls(users) + f", @{response['username']}"
         else :
             m = re.match(PATTERN_DICE, command)
@@ -36,8 +36,8 @@ class DiceService(Service):
         results = []
         for user in users:
             if USER_KEY in users[user]:
-                results.append(f"{user} : {users[user][USER_KEY]}")
-        return " 🎲 ".join(results)
+                results.append(f"{user} : {' + '.join(users[user][USER_KEY])}")
+        return " 🎲".join(results)
 
     def clear_rolls(self, users):
         for user in users:

@@ -95,5 +95,5 @@ class CommandService(Service):
             if len(msg_components) != count:
                 return MSG_WRONG_ARG_COUNT
             for i in range(0, count):
-                command = command.replace(args[i], msg_components[i])
+                command = command.replace(args[i], msg_components[i].lstrip("@"))
         return command

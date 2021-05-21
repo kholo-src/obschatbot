@@ -52,7 +52,7 @@ class ChatBot:
         if result:
             self.twitch_irc.send(result)
         else:
-            self.twitch_irc.send(MSG_UNKNOWN_CMD)
+            self.twitch_irc.send(f"{MSG_UNKNOWN_CMD}, @{response['username']}")
 
     def display_help(self):
         self.twitch_irc.send(f"{MSG_HELP}{self.list_commands()}")

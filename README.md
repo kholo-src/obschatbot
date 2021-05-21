@@ -1,5 +1,5 @@
 # OBS Chat Bot (obschatbot)
-A Twitch chat-bot that could directly interact with OBS Studio and Spotify
+A Twitch chat-bot that could directly interact with OBS Studio and Spotify. Please note this bot runs on broadcaster's side and is not hosted on a server.
 
 
 ## Requirements
@@ -21,7 +21,7 @@ You can set greeting messages in "Welcome message" (at bot start) and "Farewell 
 
 #### Twitch IRC (mandatory)
 "Nickname" is the bot's username (existing Twitch account).  
-"Password" is the bot's OAuth generated password for Twitch (https://twitchapps.com/tmi/ - you must be logged in with your bot account if different from yours to confirm this step)  
+"Password" is the bot's OAuth generated password for Twitch (https://twitchapps.com/tmi/ - you must be logged in with your bot account if different from yours to confirm this step - Free)  
 "Channel" is your Twitch streaming channel name.
 
 #### Services (optional)
@@ -59,7 +59,7 @@ This command prints the last rolls for every viewer in the chat room who has rol
 This command clears the last rolls for every viewer in the chat room.
 
 ##### Spotify Service
-This service allows your viewers to add or remove song from a given playlist. This will requires you to have a developer account (you can create one at https://developer.spotify.com/) and to create an application in your dashboard.  
+This service allows your viewers to add or remove song from a given playlist. This will requires you to have a developer account (you can create one at https://developer.spotify.com/ - Free) and to create an application in your dashboard - Also free.  
 "Playlist ID" is the ID of the playlist you want to give your viewers controls to. You can get this information by right-clicking your playlist in Spotify, "Share">"Copy Playlist Link", pasting the URL in any notepad application, and keeping the part between ".../playlist/" and "?si=..." from the URL. For instance: in "https://open.spotify.com/playlist/1a1ABC2DE34FghIJKlmno5?si=1a2b34c5defa6b7c", keep the "1a1ABC2DE34FghIJKlmno5" part.  
 "Client ID" is your application Client ID (found in Spotify developer dashboard)  
 "Client Secret" is your application Client Secret (found in Spotify developer dashboard)  

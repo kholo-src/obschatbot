@@ -1,5 +1,6 @@
 from services.Service import Service
 import os.path
+import random
 import re
 
 KNOWN_COMMANDS = ["cmd"]
@@ -41,7 +42,7 @@ class CommandService(Service):
 
     def load_command(self, line):
         components = line.split(SEPARATOR)
-        self.commands[components[0]] = components[1].replace(SUBST_SEP, SEPARATOR)
+        self.commands[components[0]] = components[1].replace(SUBST_SEP, SEPARATOR).split("||")
 
     # Settings -----
 
@@ -57,16 +58,19 @@ class CommandService(Service):
                 can_manage = True
         if not can_manage:
             return f"{MSG_CANT_MANAGE}, @{response['username']}"
-        command, action, target_command, args = response["message"].split(" ", 3)
+        components = response["message"].split(" ", 3)
+        command, action, target_command = components[0], components[1], components[2]
+        if len(components) == 4:
+            args = components[3]
         if action in ["add", "edit", "update"]:
-            return self.add_command(target_command, args) + f" ,@{response['username']}"
+            return self.add_command(target_command, args) + f", @{response['username']}"
         elif action in ["del", "delete", "remove"]:
-            return self.del_command(target_command) + f" ,@{response['username']}"
+            return self.del_command(target_command) + f", @{response['username']}"
         else:
             return f"{MSG_UNKNOWN}, @{response['username']}"
 
     def add_command(self, command, args):
-        self.commands[command.lstrip("!")] = args
+        self.commands[command.lstrip("!")] = args.split("||")
         self.write()
         return f"La commande '!{command}' a été ajoutée"
 
@@ -80,11 +84,12 @@ class CommandService(Service):
     def write(self):
         with open(self.file, "w") as file:
             for name in self.commands:
-                file.write(f"{name}{SEPARATOR}{self.commands[name].replace(SEPARATOR, SUBST_SEP)}\n")
+                file.write(f"{name}{SEPARATOR}{'||'.join(self.commands[name]).replace(SEPARATOR, SUBST_SEP)}\n")
 
     def custom(self, message):
         components = message.split(" ", 1)
-        command = self.commands.get(components[0][1:])
+        command_name = components[0][1:]
+        command = self.commands[command_name][random.randint(0, len(self.commands[command_name]) - 1)]
         args = list(dict.fromkeys(re.findall(PATTERN_ARGS, command)))
         args.sort()
         count = len(args)

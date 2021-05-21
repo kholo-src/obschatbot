@@ -37,6 +37,9 @@ The custom commands are stored in a text file, defined in "Commands list" field.
 "\<printed text\>" is the text returned by the custom command. It can support multiple arguments, for instance:  
 - ```!cmd add !so Shout out to {1} for being an awesome person, please visit https://twitch.tv/{1}``` where {1} will be replaced by the first argument following the custom command, like in "!so kholo" will result in "Shout out to kholo for being an awesome person, please visit https://twitch.tv/kholo" (I'm kholo by the way :D ) (and I... may... be that awesome! Who knows?)
 - ```!cmd add !vs Hey look out, {1} and {2} are fighting! Taking the bets!``` where {1} will be replaced by the first argument, {2} by the second argument, and so on. "!vs kholo anonlogics" will result in "Hey look out, kholo and anonlogics are fighting! Taking the bets!" (anonlogics is my bot, powered by the very current script) (and I think it will beat the hell out of me)
+
+It also supports multiple responses, separated with "||" (two vertical bars), that will be returned randomly when invoking the custom command, for instance:  
+```!cmd add !dance (_\_) (_|_) (_/_)||\o\ |o| /o/``` will make the "!dance" command returns either "(\_\\\_) (\_|\_) (\_/\_)" or "\o\ |o| /o/"
 ###### removing a command
 ```!cmd del <command name>```
 "del", "delete" and "remove" have the same results.

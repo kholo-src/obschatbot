@@ -44,13 +44,15 @@ class ChatBot:
         elif command == "stop":
             self.stop_command(response["tags"]["badges"])
             return
+        result = None
         for service in self.services:
             if not service.knows(command):
-                self.twitch_irc.send(f"{MSG_UNKNOWN_CMD}, {response['username']}")
                 continue
             result = service.eval(command, response, self.users)
-            if result:
-                self.twitch_irc.send(result)
+        if result:
+            self.twitch_irc.send(result)
+        else:
+            self.twitch_irc.send(MSG_UNKNOWN_CMD)
 
     def display_help(self):
         self.twitch_irc.send(f"{MSG_HELP}{self.list_commands()}")

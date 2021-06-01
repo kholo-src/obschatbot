@@ -29,7 +29,7 @@ Services are optional sets of commands for your bot, you can enable them by tick
 
 ##### Command Service
 This service allows your bot to receive custom commands. Only moderators and broadcasters can define them.  
-The custom commands are stored in a text file, defined in "Commands list" field.
+The custom commands are stored in a text file, defined in the "Commands list" field.
 ###### adding a command
 ```!cmd add <command name> <printed text>```
 "add", "edit" and "update" have the same results.  

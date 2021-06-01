@@ -42,7 +42,7 @@ class CommandService(Service):
 
     def load_command(self, line):
         components = line.split(SEPARATOR)
-        self.commands[components[0]] = components[1].replace(SUBST_SEP, SEPARATOR).split("||")
+        self.commands[components[0].lower()] = components[1].replace(SUBST_SEP, SEPARATOR).split("||")
 
     # Settings -----
 
@@ -59,7 +59,7 @@ class CommandService(Service):
         if not can_manage:
             return f"{MSG_CANT_MANAGE}, @{response['username']}"
         components = response["message"].split(" ", 3)
-        command, action, target_command = components[0], components[1], components[2]
+        command, action, target_command = components[0], components[1], components[2].lower()
         if len(components) == 4:
             args = components[3]
         if action in ["add", "edit", "update"]:
@@ -88,7 +88,7 @@ class CommandService(Service):
 
     def custom(self, message):
         components = message.split(" ", 1)
-        command_name = components[0][1:]
+        command_name = components[0][1:].lower()
         command = self.commands[command_name][random.randint(0, len(self.commands[command_name]) - 1)]
         args = list(dict.fromkeys(re.findall(PATTERN_ARGS, command)))
         args.sort()

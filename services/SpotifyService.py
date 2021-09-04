@@ -6,6 +6,7 @@ import requests
 KNOWN_COMMANDS = ["addsong", "dellast", "playlist"]
 USER_KEY = "last_song_added"
 
+MSG_MISSING_ARGUMENTS = "J'ai besoin d'un titre ou au moins de quelques indications"
 MSG_NOT_FOUND = "Aucun morceau trouvé :("
 MSG_NOT_ADDED = "Le morceau n'a pas pu être ajouté"
 MSG_NO_SONG = "Vous n'avez pas ajouté de morceau"
@@ -37,7 +38,10 @@ class SpotifyService(OAuth2, Service):
     def eval(self, command, response, users):
         if command == "addsong":
             user = response["username"]
-            query = response["message"].split(" ", 1)[1]
+            components = response["message"].split(" ", 1)
+            if len(components) != 2:
+                return f"🎵 {MSG_MISSING_ARGUMENTS}, @{user}🎵"
+            query = components[1]
             return self.add_song(user, query, users)
         elif command == "dellast":
             return self.del_last(response["username"], users)
